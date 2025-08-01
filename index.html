@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>妙课AI 展示首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .content-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .card-header.gamma {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .card-header p {
+            margin: 8px 0 0 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            background: #f8f9fa;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            border: none;
+            display: block;
+            background: white;
+        }
+
+        .gamma-iframe {
+            height: 500px;
+        }
+
+        .website-iframe {
+            height: 600px;
+        }
+
+        .card-footer {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .external-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .external-link:hover {
+            color: #4facfe;
+        }
+
+        .external-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .iframe-fallback {
+            display: none;
+        }
+
+        .iframe-error {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .error-content, .fallback-content {
+            text-align: center;
+            padding: 40px;
+            max-width: 400px;
+        }
+
+        .error-icon, .fallback-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .error-content h3, .fallback-content h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .error-content p, .fallback-content p {
+            color: #6c757d;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-btn, .fallback-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .error-btn.primary, .fallback-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .error-btn.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .error-btn:hover, .fallback-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .card-flow {
+                gap: 30px;
+            }
+            
+            .card-header h2 {
+                font-size: 1.4rem;
+            }
+            
+            .card-header p {
+                font-size: 0.9rem;
+            }
+            
+            .gamma-iframe {
+                height: 400px;
+            }
+            
+            .website-iframe {
+                height: 500px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>妙课AI</h1>
+            <p>让知识交互起来 | 3小时生成专业级教学资源</p>
+        </div>
+        
+        <div class="content">
+            <div class="card-flow">
+                <!-- Gamma 演示文稿卡片 -->
+                <div class="content-card">
+                    <div class="card-header gamma">
+                        <h2>📚 妙课AI 教学资源展示</h2>
+                        <p>3小时生成专业级教学资源 | 让知识交互起来</p>
+                    </div>
+                    <div class="iframe-container">
+                        <iframe id="gamma-iframe" 
+                                src="https://gamma.app/embed/g2g2x16wm1nzsus" 
+                                class="gamma-iframe"
+                                allow="fullscreen" 
+                                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Copy of Copy of 妙课AI | 让知识交互起来 | 3小时生成专业级教学资源">
+                            <div class="iframe-fallback">
+                                <div class="fallback-content">
+                                    <div class="fallback-icon">🚫</div>
+                                    <h3>无法加载Gamma演示</h3>
+                                    <p>由于浏览器安全策略限制，无法在iframe中显示Gamma内容</p>
+                                    <a href="https://gamma.app/embed/g2g2x16wm1nzsus" target="_blank" class="fallback-btn">
+                                        在新窗口中查看演示 →
+                                    </a>
+                                </div>
+                            </div>
+                        </iframe>
+                        <div id="gamma-error" class="iframe-error" style="display: none;">
+                            <div class="error-content">
+                                <div class="error-icon">⚠️</div>
+                                <h3>加载受限</h3>
+                                <p>Gamma.app限制了iframe嵌入以保护用户安全</p>
+                                <div class="error-actions">
+                                    <a href="https://gamma.app/embed/g2g2x16wm1nzsus" target="_blank" class="error-btn primary">
+                                        🚀 在新窗口打开
+                                    </a>
+                                    <button onclick="retryGammaLoad()" class="error-btn secondary">
+                                        🔄 重试加载
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div style="display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <a href="https://gamma.app/embed/g2g2x16wm1nzsus" target="_blank" class="external-link">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" />
+                                </svg>
+                                全屏查看演示
+                            </a>
+                            <span style="color: #6c757d; font-size: 0.85rem;">💡 如果上方内容无法显示，请点击此链接</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主站点网页卡片 -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>🚀 妙课AI 主站点</h2>
+                        <p>完整的AI教学资源生成平台</p>
+                    </div>
+                    <div class="iframe-container">
+                        <iframe src="http://47.94.171.205:11121/" 
+                                class="website-iframe"
+                                title="妙课AI 主站点">
+                        </iframe>
+                    </div>
+                    <div class="card-footer">
+                        <a href="http://47.94.171.205:11121/" target="_blank" class="external-link">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" />
+                            </svg>
+                            在新窗口打开
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 妙课AI. 专业教学资源生成平台</p>
+        </div>
+    </div>
+
+    <script>
+        // 添加一些交互效果和iframe错误处理
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为按钮添加点击效果
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // 创建点击波纹效果
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255, 255, 255, 0.3);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s ease-out;
+                        pointer-events: none;
+                    `;
+                    
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Gamma iframe 错误处理
+            const gammaIframe = document.getElementById('gamma-iframe');
+            const gammaError = document.getElementById('gamma-error');
+            
+            if (gammaIframe && gammaError) {
+                // 检测iframe加载失败
+                gammaIframe.addEventListener('error', function() {
+                    showGammaError();
+                });
+
+                // 检测iframe被阻止加载（延迟检查）
+                setTimeout(function() {
+                    try {
+                        // 尝试访问iframe内容，如果被阻止会抛出异常
+                        if (gammaIframe.contentDocument === null) {
+                            showGammaError();
+                        }
+                    } catch (e) {
+                        showGammaError();
+                    }
+                }, 3000);
+            }
+
+            function showGammaError() {
+                if (gammaError) {
+                    gammaError.style.display = 'flex';
+                }
+            }
+        });
+
+        // 重试加载Gamma iframe
+        function retryGammaLoad() {
+            const gammaIframe = document.getElementById('gamma-iframe');
+            const gammaError = document.getElementById('gamma-error');
+            
+            if (gammaIframe && gammaError) {
+                gammaError.style.display = 'none';
+                // 重新加载iframe
+                const src = gammaIframe.src;
+                gammaIframe.src = '';
+                setTimeout(() => {
+                    gammaIframe.src = src;
+                }, 100);
+            }
+        }
+        
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
